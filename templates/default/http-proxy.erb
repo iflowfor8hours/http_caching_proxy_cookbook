@@ -1,0 +1,40 @@
+resolver <%= node.http_caching_proxy.dns_resolver %>;
+resolver_timeout 5s;
+
+proxy_cache_path <%= node.http_caching_proxy.cache_path %> levels=2 keys_zone=proxy_cache:<%= node.http_caching_proxy.cache_size %> inactive=<%= node.http_caching_proxy.remove_inactive_data_after %> max_size=<%= node.http_caching_proxy.cache_size %>;
+proxy_ignore_headers X-Accel-Expires Expires Cache-Control Set-Cookie;
+
+proxy_temp_path <%= node.http_caching_proxy.temp_path %>;
+
+log_format cache 'time=$time_iso8601\t'
+'addr=$remote_addr\t'
+'status=$status\t'
+'cache=$upstream_cache_status\t'
+'agent=$http_user_agent\t'
+'url=$scheme://$http_host$request_uri';
+access_log /var/log/nginx/cache_access.log cache;
+  
+  server {
+  # proxy server port
+  listen <%= node.http_caching_proxy.port %>;
+  
+    location / {
+      proxy_redirect off;
+      proxy_set_header Host $http_host;
+      proxy_pass "$scheme://$http_host$request_uri";
+      proxy_cache proxy_cache;
+      proxy_cache_key $scheme$host$uri$is_args$args;
+      proxy_cache_valid 200 <%= node.http_caching_proxy.success_time %>;
+      proxy_cache_valid any <%= node.http_caching_proxy.fail_time %>;
+      
+      # access policy denies global ip addresses
+      <% @node.http_caching_proxy.allowed_subnets.each do |allow| %>
+        <%= "allow #{allow};" %>
+      <% end %>
+
+      <% @node.http_caching_proxy.denied_subnets.each do |deny| %>
+        <%= "deny #{deny};" %>
+      <% end %>
+    }
+  }
+

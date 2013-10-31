@@ -1,0 +1,12 @@
+deb mirror://mirrors.ubuntu.com/mirrors.txt raring main restricted universe multiverse                                                                                   
+deb http://archive.ubuntu.com/ubuntu raring main restricted
+deb-src http://archive.ubuntu.com/ubuntu raring main restricted
+
+deb http://archive.ubuntu.com/ubuntu raring universe
+deb-src http://archive.ubuntu.com/ubuntu raring universe
+
+deb http://archive.ubuntu.com/ubuntu raring multiverse
+deb-src http://archive.ubuntu.com/ubuntu raring multiverse
+
+deb http://extras.ubuntu.com/ubuntu raring main
+deb-src http://extras.ubuntu.com/ubuntu raring main    
